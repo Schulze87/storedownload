@@ -6,6 +6,7 @@ use Shopware\Core\PlatformRequest;
 use Shopware\Storefront\Controller\StorefrontController;
 use Shopware\Storefront\Framework\Routing\StorefrontRouteScope;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -13,23 +14,27 @@ use Symfony\Component\Routing\Attribute\Route;
 class PwaController extends StorefrontController
 {
     #[Route(path: '/pwa/manifest.json', name: 'frontend.pwa.manifest', methods: ['GET'])]
-    public function manifest(): JsonResponse
+    public function manifest(Request $request): JsonResponse
     {
+        $basePath = $request->getBasePath();
+        $startUrl = $basePath !== '' ? $basePath . '/' : '/';
+
         return new JsonResponse([
-            'name' => 'Mein Shop',
-            'short_name' => 'Shop',
-            'start_url' => '/',
+            'name' => 'TGU',
+            'short_name' => 'TGU',
+            'start_url' => $startUrl,
+            'scope' => $startUrl,
             'display' => 'standalone',
             'background_color' => '#ffffff',
             'theme_color' => '#ffffff',
             'icons' => [
                 [
-                    'src' => '/bundles/ihrprefixpwashell/icon-192.png',
+                    'src' => $basePath . '/bundles/ihrprefixpwashell/icon-192.png',
                     'sizes' => '192x192',
                     'type' => 'image/png',
                 ],
                 [
-                    'src' => '/bundles/ihrprefixpwashell/icon-512.png',
+                    'src' => $basePath . '/bundles/ihrprefixpwashell/icon-512.png',
                     'sizes' => '512x512',
                     'type' => 'image/png',
                 ],
@@ -37,13 +42,11 @@ class PwaController extends StorefrontController
         ]);
     }
 
-    #[Route(path: '/pwa/sw.js', name: 'frontend.pwa.sw', methods: ['GET'])]
+    #[Route(path: '/sw.js', name: 'frontend.pwa.sw', methods: ['GET'])]
     public function serviceWorker(): Response
     {
         $js = <<<'JS'
-self.addEventListener('fetch', function(event) {
-    event.respondWith(fetch(event.request));
-});
+self.addEventListener('fetch', () => {});
 JS;
 
         return new Response($js, 200, [
