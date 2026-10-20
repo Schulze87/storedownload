@@ -1,0 +1,11 @@
+{% sw_extends '@Storefront/storefront/layout/meta.html.twig' %}
+
+{% block layout_head_meta_tags %}
+    {{ parent() }}
+    <link rel="manifest" href="{{ path('frontend.pwa.manifest') }}">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{{ path('frontend.pwa.sw') }}');
+        }
+    </script>
+{% endblock %}
