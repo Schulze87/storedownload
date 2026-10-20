@@ -1,0 +1,32 @@
+name: Build PWA Shell Plugin
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PHP-Syntax prüfen
+        run: |
+          find ./IhrPrefixPwaShell/src -name "*.php" -exec php -l {} \;
+
+      - name: Install shopware-cli
+        uses: shopware/shopware-cli-action@v1
+        with:
+          version: 0.12.0
+
+      - name: Build Extension
+        run: shopware-cli extension zip ./IhrPrefixPwaShell --disable-git --verbose
+
+      - name: Upload ZIP as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PwaShell
+          path: "*.zip"
