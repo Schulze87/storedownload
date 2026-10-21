@@ -3,6 +3,9 @@
 {% block layout_footer_inner_container %}
     {{ parent() }}
     {% block pwa_install_bar %}
+        {% set pwaAppName = config('IhrPrefixPwaShell.config.appName') ?: 'TGU' %}
+        {% set pwaIcon = config('IhrPrefixPwaShell.config.icon192') ?: '/bundles/ihrprefixpwashell/icon-192.png' %}
+
         <style>
             #pwa-bar {
                 display: none;
@@ -101,11 +104,11 @@
             }
         </style>
 
-        <div id="pwa-bar" role="dialog" aria-label="TGU installieren">
+        <div id="pwa-bar" role="dialog" aria-label="{{ pwaAppName }} installieren">
             <div class="pwa-row">
-                <img class="pwa-logo" src="/bundles/ihrprefixpwashell/icon-192.png" alt="">
+                <img class="pwa-logo" src="{{ pwaIcon }}" alt="">
                 <div class="pwa-copy">
-                    <strong>TGU installieren</strong>
+                    <strong>{{ pwaAppName }} installieren</strong>
                     <span>Schneller Zugriff vom Startbildschirm</span>
                 </div>
                 <button id="pwa-go" class="pwa-go" type="button">Installieren</button>
