@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>PWA Einstellungen</title>
+        <title lang="de-DE">PWA Einstellungen</title>
+
+        <input-field type="text">
+            <name>appName</name>
+            <label>App-Name</label>
+            <label lang="de-DE">App-Name</label>
+            <defaultValue>TGU</defaultValue>
+        </input-field>
+
+        <input-field type="text">
+            <name>shortName</name>
+            <label>Kurzname</label>
+            <label lang="de-DE">Kurzname</label>
+            <defaultValue>TGU</defaultValue>
+        </input-field>
+
+        <input-field type="media">
+            <name>icon192</name>
+            <label>Icon 192x192</label>
+            <label lang="de-DE">Icon 192x192</label>
+        </input-field>
+
+        <input-field type="media">
+            <name>icon512</name>
+            <label>Icon 512x512</label>
+            <label lang="de-DE">Icon 512x512</label>
+        </input-field>
+    </card>
+</config>
