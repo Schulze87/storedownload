@@ -6,12 +6,12 @@
 
     <services>
         <service id="IhrPrefix\PwaShell\Storefront\Controller\PwaController" public="true">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="media.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
-            <call method="setTwig">
-                <argument type="service" id="twig"/>
-            </call>
+            <tag name="controller.service_arguments"/>
         </service>
     </services>
 </container>
