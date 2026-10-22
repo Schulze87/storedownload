@@ -2,7 +2,9 @@
 
 namespace IhrPrefix\PwaShell\Storefront\Controller;
 
-use Shopware\Core\Framework\Adapter\Twig\TemplateFinder;
+use Shopware\Core\Content\Media\MediaEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\PlatformRequest;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
@@ -17,7 +19,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class PwaController extends StorefrontController
 {
     public function __construct(
-        private readonly SystemConfigService $systemConfigService
+        private readonly SystemConfigService $systemConfigService,
+        private readonly EntityRepository $mediaRepository
     ) {
     }
 
@@ -26,6 +29,7 @@ class PwaController extends StorefrontController
     {
         $context = $request->attributes->get(PlatformRequest::ATTRIBUTE_SALES_CHANNEL_CONTEXT_OBJECT);
         $salesChannelId = $context instanceof SalesChannelContext ? $context->getSalesChannelId() : null;
+        $contextObj = $context instanceof SalesChannelContext ? $context->getContext() : null;
 
         $basePath = $request->getBasePath();
         $startUrl = $basePath !== '' ? $basePath . '/' : '/';
@@ -33,13 +37,11 @@ class PwaController extends StorefrontController
         $appName = $this->systemConfigService->getString('IhrPrefixPwaShell.config.appName', $salesChannelId) ?: 'TGU';
         $shortName = $this->systemConfigService->getString('IhrPrefixPwaShell.config.shortName', $salesChannelId) ?: 'TGU';
 
-        // Icons: media-IDs aus Config holen und URL bauen
-        $icon192Url = $this->resolveMediaUrl(
-            $this->systemConfigService->getString('IhrPrefixPwaShell.config.icon192', $salesChannelId)
-        );
-        $icon512Url = $this->resolveMediaUrl(
-            $this->systemConfigService->getString('IhrPrefixPwaShell.config.icon512', $salesChannelId)
-        );
+        $icon192Id = $this->systemConfigService->getString('IhrPrefixPwaShell.config.icon192', $salesChannelId);
+        $icon512Id = $this->systemConfigService->getString('IhrPrefixPwaShell.config.icon512', $salesChannelId);
+
+        $icon192Url = $this->resolveMediaUrl($icon192Id, $contextObj) ?: $basePath . '/bundles/ihrprefixpwashell/icon-192.png';
+        $icon512Url = $this->resolveMediaUrl($icon512Id, $contextObj) ?: $basePath . '/bundles/ihrprefixpwashell/icon-512.png';
 
         return new JsonResponse([
             'name' => $appName,
@@ -50,23 +52,26 @@ class PwaController extends StorefrontController
             'background_color' => '#ffffff',
             'theme_color' => '#ffffff',
             'icons' => [
-                ['src' => $icon192Url ?: $basePath . '/bundles/ihrprefixpwashell/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png'],
-                ['src' => $icon512Url ?: $basePath . '/bundles/ihrprefixpwashell/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png'],
+                ['src' => $icon192Url, 'sizes' => '192x192', 'type' => 'image/png'],
+                ['src' => $icon512Url, 'sizes' => '512x512', 'type' => 'image/png'],
             ],
         ]);
     }
 
-    private function resolveMediaUrl(string $mediaId): ?string
+    private function resolveMediaUrl(string $mediaId, ?\Shopware\Core\Framework\Context $context): ?string
     {
-        if ($mediaId === '') {
+        if ($mediaId === '' || $context === null) {
             return null;
         }
-        // In Shopware 6.7: MediaRepository über den Container holen und URL bauen.
-        // Alternativ: falls du nur statische Icons willst, kannst du das Medien-Feld weglassen.
-        // Für Kürze hier: Der Pfad wird über die Media-URL des Shops gebildet.
-        // Beispiel: /media/{pfad/zur/datei}.png
-        // (Erfordert Injection des MediaRepository – für einen ersten Test reicht der Fallback unten.)
-        return null;
+
+        $criteria = new Criteria([$mediaId]);
+        $media = $this->mediaRepository->search($criteria, $context)->get($mediaId);
+
+        if (!$media instanceof MediaEntity || $media->getUrl() === null) {
+            return null;
+        }
+
+        return $media->getUrl();
     }
 
     #[Route(path: '/sw.js', name: 'frontend.pwa.sw', methods: ['GET'])]
