@@ -20,16 +20,16 @@
             <defaultValue>TGU</defaultValue>
         </input-field>
 
-        <input-field type="media">
+        <input-field type="text">
             <name>icon192</name>
-            <label>Icon 192x192</label>
-            <label lang="de-DE">Icon 192x192</label>
+            <label>Icon 192x192 (Pfad oder URL)</label>
+            <label lang="de-DE">Icon 192x192 (Pfad oder URL)</label>
         </input-field>
 
-        <input-field type="media">
+        <input-field type="text">
             <name>icon512</name>
-            <label>Icon 512x512</label>
-            <label lang="de-DE">Icon 512x512</label>
+            <label>Icon 512x512 (Pfad oder URL)</label>
+            <label lang="de-DE">Icon 512x512 (Pfad oder URL)</label>
         </input-field>
     </card>
 </config>
